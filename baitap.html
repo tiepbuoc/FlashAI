@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài tập luyện tập - FlashAI</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            font-family: 'Inter', system-ui, Arial, sans-serif;
+            --blue: #2563eb; --blue-dark: #1d4ed8; --blue-light: #dbeafe;
+            --green: #16a34a; --green-light: #dcfce7;
+            --red: #dc2626; --red-light: #fee2e2;
+            --orange: #ea580c; --orange-light: #fff7ed;
+            --purple: #7c3aed; --purple-light: #f5f3ff;
+            --yellow: #ca8a04; --yellow-light: #fefce8;
+        }
+        body { font-family: 'Inter', system-ui, Arial, sans-serif; background: #f0f4ff; min-height: 100vh; color: #1e293b; }
+
+        /* TOP BAR */
+        #top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+            color: white; box-shadow: 0 2px 12px rgba(37,99,235,0.25); position: sticky; top: 0; z-index: 50;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo i { font-size: 24px; }
+        .logo h1 { font-size: 21px; font-weight: 800; letter-spacing: -0.4px; }
+        .back-btn {
+            background: rgba(255,255,255,0.18); border: none; color: white;
+            padding: 8px 18px; border-radius: 30px; cursor: pointer; font-size: 14px;
+            font-weight: 600; transition: background 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* HOME SCREEN */
+        #home-screen { max-width: 700px; margin: 48px auto; padding: 0 20px; text-align: center; }
+        .page-title { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+        .page-subtitle { color: #64748b; font-size: 1.05rem; margin-bottom: 40px; }
+        .exercise-cards { display: flex; flex-direction: column; gap: 18px; }
+        .ex-card {
+            background: white; border-radius: 20px; padding: 26px 28px;
+            display: flex; align-items: center; gap: 22px; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07); border: 2px solid transparent;
+            transition: all 0.25s ease; text-align: left;
+        }
+        .ex-card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0,0,0,0.12); }
+        .ex-card.flashcard:hover { border-color: var(--blue); }
+        .ex-card.essay:hover { border-color: var(--orange); }
+        .ex-card.quiz:hover { border-color: var(--purple); }
+        .ex-icon { width: 62px; height: 62px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+        .ex-icon.blue { background: #eff6ff; color: var(--blue); }
+        .ex-icon.orange { background: var(--orange-light); color: var(--orange); }
+        .ex-icon.purple { background: var(--purple-light); color: var(--purple); }
+        .ex-info h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+        .ex-info p { color: #64748b; font-size: 0.92rem; line-height: 1.5; }
+        .ex-arrow { margin-left: auto; color: #cbd5e1; font-size: 18px; flex-shrink: 0; }
+
+        /* SETUP SCREEN */
+        #setup-screen { display: none; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .setup-card { background: white; border-radius: 24px; padding: 36px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+        .setup-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+        .setup-subtitle { color: #64748b; font-size: 0.95rem; margin-bottom: 28px; }
+        .field-group { margin-bottom: 22px; }
+        .field-group label { display: block; font-weight: 600; color: #374151; font-size: 0.93rem; margin-bottom: 8px; }
+        .field-group input, .field-group select, .field-group textarea {
+            width: 100%; padding: 13px 16px; border: 2px solid #e2e8f0;
+            border-radius: 14px; font-size: 15px; font-family: inherit; background: white;
+            transition: border 0.2s, box-shadow 0.2s; resize: vertical;
+        }
+        .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
+            outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+        }
+        .generate-btn {
+            width: 100%; padding: 15px;
+            background: linear-gradient(105deg, var(--blue) 0%, var(--blue-dark) 100%);
+            color: white; border: none; border-radius: 40px; cursor: pointer;
+            font-size: 17px; font-weight: 700; transition: all 0.25s;
+            box-shadow: 0 6px 18px rgba(37,99,235,0.3);
+        }
+        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(37,99,235,0.4); }
+        .generate-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+        /* RESULT SCREEN */
+        #result-screen { display: none; max-width: 780px; margin: 32px auto; padding: 0 20px 60px; }
+        .result-header {
+            background: white; border-radius: 20px; padding: 22px 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07); margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .result-title { font-size: 1.3rem; font-weight: 800; }
+        .result-meta { color: #64748b; font-size: 0.88rem; margin-top: 3px; }
+        .redo-btn {
+            background: var(--blue-light); color: var(--blue); border: none;
+            padding: 10px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.2s;
+        }
+        .redo-btn:hover { background: var(--blue); color: white; }
+
+        /* LOADING BOX */
+        .loading-box {
+            background: white; border-radius: 20px; padding: 52px 28px; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .spinner {
+            width: 56px; height: 56px; border: 5px solid rgba(37,99,235,0.15);
+            border-top-color: var(--blue); border-radius: 50%;
+            animation: spin 0.75s linear infinite; margin: 0 auto 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+        .loading-sub { color: #64748b; font-size: 0.9rem; }
+        .loading-dots::after {
+            content: ''; animation: dots 1.4s steps(4,end) infinite;
+        }
+        @keyframes dots {
+            0%,20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%,100% { content: '...'; }
+        }
+
+        /* INLINE LOADING (for grading) */
+        .inline-loading {
+            display: flex; align-items: center; gap: 10px;
+            background: #eff6ff; border-radius: 12px; padding: 12px 16px; margin-top: 12px;
+        }
+        .mini-spinner {
+            width: 18px; height: 18px; border: 3px solid rgba(37,99,235,0.2);
+            border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+        }
+        .inline-loading span { font-size: 0.88rem; color: var(--blue); font-weight: 600; }
+
+        /* SCORE BAR */
+        .score-bar {
+            background: white; border-radius: 20px; padding: 24px 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07); margin-bottom: 20px;
+        }
+        .score-summary-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .score-label { font-size: 1rem; font-weight: 700; }
+        .score-num { font-size: 2.2rem; font-weight: 800; color: var(--blue); }
+        .score-detail { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; font-size: 0.95rem; font-weight: 700; }
+        .score-correct { color: var(--green); }
+        .score-wrong-label { color: var(--red); }
+        .score-wrong-list { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 0.9rem; color: #475569; }
+        .score-wrong-list strong { display: block; margin-bottom: 8px; color: #1e293b; }
+        .score-perfect { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; color: var(--green); font-weight: 700; font-size: 0.95rem; }
+        .wrong-chip {
+            display: inline-block; background: var(--red-light); color: var(--red); border: 1.5px solid #fecaca;
+            padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+            margin: 3px 4px 3px 0; transition: all 0.2s;
+        }
+        .wrong-chip:hover { background: var(--red); color: white; }
+
+        /* ---- FLASHCARD ---- */
+        .flashcard-stack { display: flex; flex-direction: column; align-items: center; }
+        .fc-progress-bar-wrap { width: 100%; max-width: 480px; height: 6px; background: #e2e8f0; border-radius: 99px; margin-bottom: 20px; overflow: hidden; }
+        .fc-progress-bar { height: 100%; background: linear-gradient(90deg, var(--blue), #7c3aed); border-radius: 99px; transition: width 0.4s ease; }
+        .fc-card { width: 100%; max-width: 480px; height: 300px; perspective: 1000px; margin: 0 auto 10px; cursor: pointer; }
+        .fc-card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4,0.2,0.2,1); }
+        .fc-card.flipped .fc-card-inner { transform: rotateY(180deg); }
+        .fc-front, .fc-back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 28px 24px; box-sizing: border-box; box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        .fc-front { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .fc-front .fc-word { font-size: 2.4rem; font-weight: 800; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 10px; text-align: center; }
+        .fc-front .fc-phonetic { font-size: 1rem; color: rgba(255,255,255,0.82); margin-bottom: 14px; letter-spacing: 1px; }
+        .fc-front .fc-hint { font-size: 0.82rem; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.12); padding: 5px 14px; border-radius: 20px; }
+        .fc-back { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; transform: rotateY(180deg); justify-content: flex-start; overflow-y: auto; }
+        .fc-back .fc-meaning { font-size: 1.5rem; font-weight: 800; color: white; text-align: center; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .fc-back .fc-phonetic-back { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 10px; }
+        .fc-back .fc-example { font-style: italic; font-size: 0.95rem; color: rgba(255,255,255,0.9); text-align: center; margin-bottom: 5px; }
+        .fc-back .fc-trans { font-size: 0.82rem; color: rgba(255,255,255,0.72); text-align: center; margin-bottom: 14px; }
+        .back-actions { display: flex; justify-content: space-around; width: 100%; margin-top: auto; gap: 12px; }
+        .back-actions .fc-btn { flex: 1; padding: 11px 0; border-radius: 30px; cursor: pointer; color: white; font-weight: 700; font-size: 15px; border: none; transition: all 0.25s; text-align: center; }
+        .fc-btn-wrong { background: rgba(244,67,54,0.82); }
+        .fc-btn-wrong:hover { background: #e53935; transform: scale(1.04); }
+        .fc-btn-right { background: rgba(76,175,80,0.85); }
+        .fc-btn-right:hover { background: #43a047; transform: scale(1.04); }
+        .fc-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 18px; width: 100%; max-width: 480px; }
+        .fc-nav button { background: white; border: 2px solid var(--blue-light); color: var(--blue); padding: 10px 26px; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 15px; transition: all 0.2s; }
+        .fc-nav button:hover:not([disabled]) { background: var(--blue); color: white; border-color: var(--blue); }
+        .fc-nav button[disabled] { opacity: 0.35; cursor: not-allowed; }
+        .fc-counter { color: #94a3b8; font-size: 0.9rem; min-width: 64px; text-align: center; font-weight: 600; }
+        .fc-score { display: flex; gap: 16px; justify-content: center; margin-top: 16px; font-size: 13px; font-weight: 700; }
+        .fc-score-known { color: var(--green); }
+        .fc-score-redo { color: var(--red); }
+
+        /* FC COMPLETE */
+        .fc-complete { background: white; border-radius: 20px; padding: 36px 28px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.08); max-width: 540px; margin: 0 auto; }
+        .fc-complete h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; color: #1e293b; }
+        .fc-complete p { color: #64748b; margin-bottom: 22px; }
+        .fc-big-score { font-size: 3rem; font-weight: 800; color: var(--blue); line-height: 1; margin-bottom: 6px; }
+        .fc-result-table { width: 100%; border-collapse: collapse; margin: 18px 0 24px; text-align: left; font-size: 0.88rem; }
+        .fc-result-table th { background: #f8fafc; color: #374151; font-weight: 700; padding: 9px 12px; border-bottom: 2px solid #e2e8f0; }
+        .fc-result-table td { padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #475569; }
+        .fc-result-table tr:last-child td { border-bottom: none; }
+        .fc-result-table .badge-known { background: var(--green-light); color: var(--green); padding: 2px 10px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; }
+        .fc-result-table .badge-redo { background: var(--red-light); color: var(--red); padding: 2px 10px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; }
+        .fc-result-table .badge-skip { background: #f1f5f9; color: #64748b; padding: 2px 10px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; }
+
+        /* ---- ESSAY ---- */
+        .essay-block { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.07); margin-bottom: 16px; }
+        .essay-q-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+        .essay-q { font-size: 1rem; font-weight: 700; color: #1e293b; flex: 1; }
+        .result-badge { font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+        .result-badge.correct { background: var(--green-light); color: var(--green); }
+        .result-badge.wrong { background: var(--red-light); color: var(--red); }
+        .result-badge.pending { background: #f1f5f9; color: #64748b; }
+        .essay-prompt { color: #475569; font-size: 0.92rem; margin-bottom: 14px; padding: 12px 16px; background: #f8fafc; border-radius: 12px; border-left: 3px solid #cbd5e1; }
+        .essay-answer { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 90px; background: white; transition: border 0.2s; }
+        .essay-answer:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 4px rgba(234,88,12,0.1); }
+        .essay-feedback { margin-top: 14px; padding: 16px 18px; border-radius: 14px; display: none; }
+        .essay-feedback.correct { background: var(--green-light); border-left: 4px solid var(--green); }
+        .essay-feedback.wrong { background: var(--red-light); border-left: 4px solid var(--red); }
+        .essay-feedback.partial { background: var(--yellow-light); border-left: 4px solid var(--yellow); }
+        .essay-feedback .fb-score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .fb-score-big { font-size: 1.8rem; font-weight: 800; }
+        .fb-score-big.good { color: var(--green); }
+        .fb-score-big.ok { color: var(--yellow); }
+        .fb-score-big.bad { color: var(--red); }
+        .fb-verdict { font-weight: 700; font-size: 0.95rem; }
+        .fb-section { margin-top: 10px; font-size: 0.88rem; color: #374151; line-height: 1.6; }
+        .fb-section strong { display: block; font-weight: 700; margin-bottom: 3px; color: #1e293b; }
+        .fb-error-item { background: rgba(220,38,38,0.08); border-radius: 8px; padding: 6px 10px; margin: 4px 0; font-size: 0.85rem; }
+        .fb-error-item .err-original { color: var(--red); font-weight: 600; }
+        .fb-error-item .err-arrow { color: #64748b; margin: 0 4px; }
+        .fb-error-item .err-correct { color: var(--green); font-weight: 600; }
+        .fb-error-item .err-note { color: #64748b; font-size: 0.8rem; }
+        .fb-sample { background: rgba(37,99,235,0.07); border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 0.87rem; color: #1e40af; font-style: italic; }
+
+        .submit-essay-btn {
+            background: linear-gradient(105deg, var(--orange) 0%, #c2410c 100%);
+            color: white; border: none; padding: 14px 32px; border-radius: 30px;
+            font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 22px; width: 100%;
+            box-shadow: 0 6px 18px rgba(234,88,12,0.3); transition: all 0.25s;
+        }
+        .submit-essay-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(234,88,12,0.4); }
+        .submit-essay-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+        /* ---- QUIZ ---- */
+        .quiz-block { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.07); margin-bottom: 16px; }
+        .quiz-q-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+        .quiz-q { font-size: 1rem; font-weight: 700; color: #1e293b; flex: 1; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-opt {
+            padding: 13px 18px; border-radius: 14px; border: 2px solid #e2e8f0;
+            cursor: pointer; font-size: 15px; font-weight: 500; transition: all 0.2s;
+            text-align: left; background: white; width: 100%;
+        }
+        .quiz-opt:hover:not([disabled]) { border-color: var(--purple); background: var(--purple-light); color: var(--purple); }
+        .quiz-opt.correct { border-color: var(--green) !important; background: var(--green-light) !important; color: var(--green) !important; font-weight: 700; }
+        .quiz-opt.wrong { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; font-weight: 700; }
+        .quiz-opt.missed { border-color: var(--green); background: rgba(22,163,74,0.06); }
+        .quiz-opt[disabled] { cursor: default; }
+        .quiz-explain {
+            margin-top: 14px; padding: 14px 16px; border-radius: 14px;
+            background: #eff6ff; border-left: 4px solid var(--blue);
+            font-size: 0.9rem; color: #1e40af; line-height: 1.6; display: none;
+        }
+        .quiz-explain .explain-why { font-weight: 700; margin-bottom: 4px; }
+        .quiz-explain .explain-detail { color: #374151; }
+        .quiz-correct-label { color: var(--green); font-weight: 700; margin-top: 6px; font-size: 0.87rem; }
+        .quiz-wrong-reason { color: var(--red); font-weight: 700; margin-top: 6px; font-size: 0.87rem; }
+
+        @keyframes flashHL { 0% { box-shadow: 0 0 0 5px rgba(220,38,38,0.5); } 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.07); } }
+        .flash-highlight { animation: flashHL 1.2s ease; }
+
+        @media (max-width: 600px) {
+            .page-title { font-size: 1.5rem; }
+            .ex-card { padding: 18px 16px; gap: 14px; }
+            .result-header { flex-direction: column; }
+            .setup-card { padding: 24px 18px; }
+            .fc-front .fc-word { font-size: 1.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="top-bar">
+        <div class="logo">
+            <i class="fa-solid fa-bolt-lightning"></i>
+            <h1>FlashAI</h1>
+        </div>
+        <button class="back-btn" onclick="goBack()">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </button>
+    </div>
+
+    <!-- HOME -->
+    <div id="home-screen">
+        <div class="page-title">📚 Bài tập luyện tập</div>
+        <div class="page-subtitle">Chọn loại bài tập — AI sẽ soạn đề theo yêu cầu của bạn</div>
+        <div class="exercise-cards">
+            <div class="ex-card flashcard" onclick="openSetup('flashcard')">
+                <div class="ex-icon blue"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="ex-info">
+                    <h3>🃏 Flashcard</h3>
+                    <p>AI tạo bộ thẻ từ vựng theo chủ đề, kèm nghĩa, phát âm, câu ví dụ. Lật thẻ để ghi nhớ và xem kết quả chi tiết.</p>
+                </div>
+                <i class="fa-solid fa-chevron-right ex-arrow"></i>
+            </div>
+            <div class="ex-card essay" onclick="openSetup('essay')">
+                <div class="ex-icon orange"><i class="fa-solid fa-pen-nib"></i></div>
+                <div class="ex-info">
+                    <h3>✍️ Tự luận</h3>
+                    <p>AI ra câu hỏi tự luận, bạn viết câu trả lời tiếng Anh. AI chấm điểm chi tiết, chỉ rõ từng lỗi sai và cách sửa.</p>
+                </div>
+                <i class="fa-solid fa-chevron-right ex-arrow"></i>
+            </div>
+            <div class="ex-card quiz" onclick="openSetup('quiz')">
+                <div class="ex-icon purple"><i class="fa-solid fa-list-check"></i></div>
+                <div class="ex-info">
+                    <h3>📝 Trắc nghiệm</h3>
+                    <p>AI tạo bài trắc nghiệm 4 lựa chọn. Mỗi câu đều có giải thích tại sao đúng/sai sau khi bạn trả lời.</p>
+                </div>
+                <i class="fa-solid fa-chevron-right ex-arrow"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETUP -->
+    <div id="setup-screen">
+        <div class="setup-card">
+            <div class="setup-title" id="setup-title">Thiết lập bài tập</div>
+            <div class="setup-subtitle" id="setup-subtitle">Nhập thông tin để AI tạo bài tập cho bạn</div>
+            <div class="field-group">
+                <label>📌 Chủ đề / Yêu cầu cụ thể</label>
+                <textarea id="setup-topic" rows="3" placeholder="Ví dụ: Từ vựng về động vật, Ngữ pháp thì hiện tại hoàn thành, Tự luận về gia đình..."></textarea>
+            </div>
+            <div class="field-group">
+                <label>📊 Trình độ</label>
+                <select id="setup-level">
+                    <option value="cơ bản (A1-A2)">Cơ bản (A1–A2)</option>
+                    <option value="trung bình (B1-B2)" selected>Trung bình (B1–B2)</option>
+                    <option value="nâng cao (C1-C2)">Nâng cao (C1–C2)</option>
+                </select>
+            </div>
+            <div class="field-group" id="count-group">
+                <label id="count-label">🔢 Số lượng</label>
+                <input type="number" id="setup-count" min="3" max="20" value="5" />
+            </div>
+            <button class="generate-btn" id="gen-btn" onclick="generate()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo bài tập bằng AI
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="result-screen">
+        <div class="result-header">
+            <div>
+                <div class="result-title" id="result-title">Bài tập</div>
+                <div class="result-meta" id="result-meta"></div>
+            </div>
+            <button class="redo-btn" onclick="openSetup(currentType)">
+                <i class="fa-solid fa-rotate-right"></i> Tạo lại
+            </button>
+        </div>
+        <div id="exercise-area"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFt47TgrNSI7dbk-rYw7N4gciLb37P08w",
+            authDomain: "duyaaaa-57201.firebaseapp.com",
+            projectId: "duyaaaa-57201",
+            storageBucket: "duyaaaa-57201.firebasestorage.app",
+            messagingSenderId: "124502081437",
+            appId: "1:124502081437:web:96e28810068e32f7abb974",
+            measurementId: "G-10YX70CFYP"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        auth.onAuthStateChanged(u => { if (!u) auth.signInAnonymously().catch(() => {}); });
+
+        const API_URL = "https://api.shopaikey.com/v1/chat/completions";
+        function getAPIKey() { return "sk-4150297863e3eee405805e8609648e6c5cebb1b502ffb46e"; }
+
+        async function callAI(prompt, systemPrompt) {
+            const messages = [];
+            if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+            messages.push({ role: 'user', content: prompt });
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAPIKey()}` },
+                body: JSON.stringify({ model: 'gpt-5.4-nano', messages, temperature: 0.7 })
+            });
+            if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
+            const data = await res.json();
+            return data.choices[0].message.content;
+        }
+
+        function parseJSON(raw) {
+            return JSON.parse(raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim());
+        }
+
+        let currentType = 'flashcard';
+        const homeScreen = document.getElementById('home-screen');
+        const setupScreen = document.getElementById('setup-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        function showScreen(name) {
+            homeScreen.style.display = name === 'home' ? 'block' : 'none';
+            setupScreen.style.display = name === 'setup' ? 'block' : 'none';
+            resultScreen.style.display = name === 'result' ? 'block' : 'none';
+            window.scrollTo(0, 0);
+        }
+
+        function goBack() {
+            if (resultScreen.style.display !== 'none') { showScreen('home'); return; }
+            if (setupScreen.style.display !== 'none') { showScreen('home'); return; }
+            window.location.href = 'main.html';
+        }
+
+        const setupCfg = {
+            flashcard: { title: '🃏 Tạo Flashcard', sub: 'Nhập chủ đề để AI tạo bộ thẻ từ vựng chi tiết', count: 'Số thẻ (3–20)', max: 20, default: 6 },
+            essay:     { title: '✍️ Tạo Tự luận',  sub: 'AI ra câu hỏi, bạn viết câu trả lời tiếng Anh', count: 'Số câu hỏi (2–8)', max: 8, default: 4 },
+            quiz:      { title: '📝 Tạo Trắc nghiệm', sub: 'AI tạo câu hỏi trắc nghiệm 4 lựa chọn', count: 'Số câu (3–20)', max: 20, default: 8 }
+        };
+
+        function openSetup(type) {
+            currentType = type;
+            const cfg = setupCfg[type];
+            document.getElementById('setup-title').textContent = cfg.title;
+            document.getElementById('setup-subtitle').textContent = cfg.sub;
+            document.getElementById('count-label').textContent = '🔢 ' + cfg.count;
+            document.getElementById('setup-count').max = cfg.max;
+            document.getElementById('setup-count').value = cfg.default;
+            showScreen('setup');
+        }
+
+        function setLoading(msg, sub) {
+            document.getElementById('exercise-area').innerHTML = `
+                <div class="loading-box">
+                    <div class="spinner"></div>
+                    <div class="loading-title">${msg}<span class="loading-dots"></span></div>
+                    ${sub ? `<div class="loading-sub">${sub}</div>` : ''}
+                </div>`;
+        }
+
+        async function generate() {
+            const topic = document.getElementById('setup-topic').value.trim();
+            const level = document.getElementById('setup-level').value;
+            const count = parseInt(document.getElementById('setup-count').value) || 5;
+            if (!topic) { alert('Vui lòng nhập chủ đề hoặc yêu cầu!'); document.getElementById('setup-topic').focus(); return; }
+
+            const btn = document.getElementById('gen-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tạo...';
+            setLoading(`AI đang soạn bài về "${topic}"`, 'Có thể mất 5–15 giây, vui lòng chờ...');
+            showScreen('result');
+
+            try {
+                if (currentType === 'flashcard') await genFlashcard(topic, level, count);
+                else if (currentType === 'essay') await genEssay(topic, level, count);
+                else await genQuiz(topic, level, count);
+            } catch (e) {
+                document.getElementById('exercise-area').innerHTML = `
+                    <div class="loading-box">
+                        <div style="font-size:2.5rem;margin-bottom:14px">⚠️</div>
+                        <div class="loading-title" style="color:#dc2626">Có lỗi xảy ra</div>
+                        <div class="loading-sub" style="margin-top:6px;color:#64748b">${e.message}</div>
+                        <button onclick="openSetup(currentType)" style="margin-top:20px;background:var(--blue);color:white;border:none;padding:12px 28px;border-radius:30px;cursor:pointer;font-weight:700;font-size:15px;">Thử lại</button>
+                    </div>`;
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Tạo bài tập bằng AI';
+        }
+
+        /* ========== FLASHCARD ========== */
+        let fcCards = [], fcIndex = 0, fcKnown = 0, fcRedo = 0, fcResults = [];
+
+        async function genFlashcard(topic, level, count) {
+            const prompt = `Tạo ${count} flashcard từ vựng tiếng Anh về chủ đề hoặc yêu cầu: "${topic}", trình độ ${level}.
+Trả về JSON hợp lệ, không markdown:
+{"cards":[{"word":"...","phonetic":"...","partOfSpeech":"n/v/adj/adv/...","meaning":"(nghĩa tiếng Việt)","example":"(câu ví dụ tiếng Anh)","exampleTranslation":"(dịch nghĩa câu ví dụ)","tip":"(mẹo nhớ từ ngắn gọn, nếu có)"},...]}`
+            const raw = await callAI(prompt, 'Bạn là giáo viên tiếng Anh chuyên nghiệp. Chỉ trả về JSON thuần, không giải thích thêm.');
+            const data = parseJSON(raw);
+            fcCards = data.cards || [];
+            if (!fcCards.length) throw new Error('AI không tạo được thẻ. Thử lại!');
+            fcIndex = 0; fcKnown = 0; fcRedo = 0;
+            fcResults = new Array(fcCards.length).fill(null); // null=chưa xem, 'known', 'redo'
+
+            document.getElementById('result-title').textContent = '🃏 Flashcard: ' + topic;
+            document.getElementById('result-meta').textContent = `${fcCards.length} thẻ · ${level} · Bấm thẻ để lật · Chọn Đã nhớ / Học lại`;
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            if (!fcCards.length) return;
+            const card = fcCards[fcIndex];
+            const pct = Math.round((fcIndex / fcCards.length) * 100);
+            const area = document.getElementById('exercise-area');
+
+            area.innerHTML = `
+                <div class="flashcard-stack">
+                    <div class="fc-progress-bar-wrap"><div class="fc-progress-bar" style="width:${pct}%"></div></div>
+                    <div class="fc-card" id="fc-main">
+                        <div class="fc-card-inner">
+                            <div class="fc-front">
+                                <div class="fc-word">${card.word}</div>
+                                ${card.partOfSpeech ? `<div style="font-size:0.78rem;background:rgba(255,255,255,0.18);padding:3px 12px;border-radius:20px;color:rgba(255,255,255,0.9);margin-bottom:8px;">${card.partOfSpeech}</div>` : ''}
+                                ${card.phonetic ? `<div class="fc-phonetic">/${card.phonetic}/</div>` : ''}
+                                <div class="fc-hint">👆 Bấm để xem nghĩa</div>
+                            </div>
+                            <div class="fc-back">
+                                <div class="fc-meaning">${card.meaning}</div>
+                                ${card.phonetic ? `<div class="fc-phonetic-back">/${card.phonetic}/</div>` : ''}
+                                ${card.example ? `<div class="fc-example">"${card.example}"</div>` : ''}
+                                ${card.exampleTranslation ? `<div class="fc-trans">→ ${card.exampleTranslation}</div>` : ''}
+                                ${card.tip ? `<div style="font-size:0.78rem;background:rgba(255,255,255,0.15);padding:5px 12px;border-radius:10px;margin-bottom:10px;color:rgba(255,255,255,0.85)">💡 ${card.tip}</div>` : ''}
+                                <div class="back-actions">
+                                    <button class="fc-btn fc-btn-wrong" onclick="fcAction('redo')">🔄 Học lại</button>
+                                    <button class="fc-btn fc-btn-right" onclick="fcAction('known')">✅ Đã nhớ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fc-score">
+                        <span class="fc-score-known">✅ Đã nhớ: ${fcKnown}</span>
+                        <span class="fc-score-redo" style="color:var(--red)">🔄 Học lại: ${fcRedo}</span>
+                    </div>
+                    <div class="fc-nav">
+                        <button onclick="fcNav(-1)" ${fcIndex === 0 ? 'disabled' : ''}>← Trước</button>
+                        <span class="fc-counter">${fcIndex + 1} / ${fcCards.length}</span>
+                        <button onclick="fcNav(1)" ${fcIndex === fcCards.length - 1 ? 'disabled' : ''}>Tiếp →</button>
+                    </div>
+                </div>`;
+
+            document.getElementById('fc-main').addEventListener('click', function (e) {
+                if (!e.target.closest('.back-actions')) this.classList.toggle('flipped');
+            });
+        }
+
+        function fcAction(type) {
+            fcResults[fcIndex] = type;
+            if (type === 'known') fcKnown++; else fcRedo++;
+            if (fcIndex < fcCards.length - 1) { fcIndex++; renderFlashcard(); }
+            else showFcComplete();
+        }
+
+        function fcNav(dir) {
+            fcIndex = Math.max(0, Math.min(fcCards.length - 1, fcIndex + dir));
+            renderFlashcard();
+        }
+
+        function showFcComplete() {
+            const total = fcCards.length;
+            const pct = Math.round((fcKnown / total) * 100);
+            const skipped = fcResults.filter(r => r === null).length;
+
+            const rows = fcCards.map((card, i) => {
+                const r = fcResults[i];
+                const badge = r === 'known'
+                    ? '<span class="badge-known">✅ Đã nhớ</span>'
+                    : r === 'redo'
+                        ? '<span class="badge-redo">🔄 Học lại</span>'
+                        : '<span class="badge-skip">— Chưa xem</span>';
+                return `<tr>
+                    <td><strong>${card.word}</strong> ${card.phonetic ? `<span style="color:#94a3b8;font-size:0.8rem">/${card.phonetic}/</span>` : ''}</td>
+                    <td>${card.meaning}</td>
+                    <td>${badge}</td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('exercise-area').innerHTML = `
+                <div class="fc-complete">
+                    <div style="font-size:3rem;margin-bottom:10px">🎉</div>
+                    <h2>Hoàn thành bộ thẻ!</h2>
+                    <div class="fc-big-score">${pct}%</div>
+                    <p>Đã nhớ <strong>${fcKnown}</strong> · Học lại <strong>${fcRedo}</strong> · Bỏ qua <strong>${skipped}</strong> / ${total} thẻ</p>
+                    <table class="fc-result-table">
+                        <thead><tr><th>Từ</th><th>Nghĩa</th><th>Kết quả</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                        <button onclick="fcKnown=0;fcRedo=0;fcIndex=0;fcResults=new Array(fcCards.length).fill(null);renderFlashcard()"
+                            style="background:linear-gradient(105deg,var(--blue),var(--blue-dark));color:white;border:none;padding:12px 26px;border-radius:30px;font-weight:700;cursor:pointer;font-size:15px;box-shadow:0 4px 14px rgba(37,99,235,0.3)">
+                            🔄 Học lại từ đầu
+                        </button>
+                        <button onclick="openSetup('flashcard')"
+                            style="background:white;color:var(--blue);border:2px solid var(--blue-light);padding:12px 26px;border-radius:30px;font-weight:700;cursor:pointer;font-size:15px;">
+                            ✨ Tạo bộ mới
+                        </button>
+                    </div>
+                </div>`;
+        }
+
+        /* ========== ESSAY ========== */
+        let essayQuestions = [];
+
+        async function genEssay(topic, level, count) {
+            const prompt = `Tạo ${count} câu hỏi tự luận tiếng Anh theo yêu cầu: "${topic}", trình độ ${level}.
+Mỗi câu yêu cầu học sinh viết 1–3 câu tiếng Anh.
+Trả về JSON hợp lệ, không markdown:
+{"questions":[{
+  "question":"(câu hỏi bằng tiếng Việt, rõ ràng và cụ thể)",
+  "prompt":"(hướng dẫn viết cụ thể bằng tiếng Việt, ví dụ: Hãy viết 1-2 câu tiếng Anh mô tả...)",
+  "sampleAnswer":"(câu trả lời mẫu hoàn chỉnh bằng tiếng Anh)",
+  "keyPoints":["điểm cần có 1","điểm cần có 2"]
+},...]}`;
+            const raw = await callAI(prompt, 'Bạn là giáo viên tiếng Anh. Chỉ trả về JSON thuần.');
+            const data = parseJSON(raw);
+            essayQuestions = data.questions || [];
+            if (!essayQuestions.length) throw new Error('AI không tạo được câu hỏi. Thử lại!');
+
+            document.getElementById('result-title').textContent = '✍️ Tự luận: ' + topic;
+            document.getElementById('result-meta').textContent = `${essayQuestions.length} câu · ${level} · Viết câu trả lời tiếng Anh · AI chấm từng câu`;
+
+            const area = document.getElementById('exercise-area');
+            area.innerHTML = essayQuestions.map((q, i) => `
+                <div class="essay-block" id="essay-block-${i}">
+                    <div class="essay-q-header">
+                        <div class="essay-q">Câu ${i + 1}: ${q.question}</div>
+                        <span class="result-badge pending" id="essay-badge-${i}">Chờ chấm</span>
+                    </div>
+                    <div class="essay-prompt">${q.prompt}</div>
+                    <textarea class="essay-answer" id="essay-ans-${i}" placeholder="Viết câu trả lời tiếng Anh của bạn ở đây..."></textarea>
+                    <div id="essay-loading-${i}" style="display:none">
+                        <div class="inline-loading">
+                            <div class="mini-spinner"></div>
+                            <span>AI đang chấm câu ${i + 1}...</span>
+                        </div>
+                    </div>
+                    <div class="essay-feedback" id="essay-fb-${i}"></div>
+                </div>
+            `).join('') +
+            `<div class="score-bar" id="essay-score-bar" style="display:none"></div>
+             <button class="submit-essay-btn" id="submit-essay-btn" onclick="checkEssays()">
+                 <i class="fa-solid fa-check-circle"></i> Nộp bài &amp; AI chấm điểm
+             </button>`;
+        }
+
+        async function checkEssays() {
+            const btn = document.getElementById('submit-essay-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI đang chấm từng câu...';
+
+            let totalScore = 0, correctCount = 0;
+            const wrongList = [];
+
+            for (let i = 0; i < essayQuestions.length; i++) {
+                const q = essayQuestions[i];
+                const answer = (document.getElementById(`essay-ans-${i}`)?.value || '').trim();
+                const fb = document.getElementById(`essay-fb-${i}`);
+                const badge = document.getElementById(`essay-badge-${i}`);
+                const loadingEl = document.getElementById(`essay-loading-${i}`);
+
+                // Show inline loading
+                if (loadingEl) loadingEl.style.display = 'block';
+
+                if (!answer) {
+                    if (loadingEl) loadingEl.style.display = 'none';
+                    badge.className = 'result-badge wrong'; badge.textContent = '❌ Chưa trả lời';
+                    fb.className = 'essay-feedback wrong'; fb.style.display = 'block';
+                    fb.innerHTML = `<div class="fb-score-row"><span class="fb-score-big bad">0</span><span class="fb-verdict">/10 — Bỏ trống</span></div>
+                        <div class="fb-section"><strong>📌 Nhận xét:</strong>Bạn chưa viết câu trả lời cho câu này.</div>
+                        <div class="fb-sample">💡 Câu mẫu: <em>${q.sampleAnswer}</em></div>`;
+                    wrongList.push(i + 1);
+                    continue;
+                }
+
+                const gradingPrompt = `Học sinh được yêu cầu: "${q.question}"
+Hướng dẫn: "${q.prompt}"
+Câu trả lời mẫu: "${q.sampleAnswer}"
+Các điểm cần có: ${JSON.stringify(q.keyPoints || [])}
+Học sinh viết: "${answer}"
+
+Hãy chấm điểm (thang 0-10) và phân tích chi tiết. Trả về JSON thuần, không markdown:
+{
+  "score": (số nguyên 0-10),
+  "isCorrect": (true nếu score >= 6),
+  "verdict": "(Xuất sắc / Tốt / Đạt / Chưa đạt — 1-2 từ)",
+  "grammarErrors": [{"original":"(lỗi gốc)","corrected":"(sửa thành)","explanation":"(giải thích ngắn tiếng Việt)"}],
+  "vocabularyErrors": [{"original":"(từ sai/kém)","better":"(từ tốt hơn)","explanation":"(giải thích)"}],
+  "positives": "(điểm tốt trong bài, 1 câu tiếng Việt)",
+  "suggestion": "(gợi ý cải thiện cụ thể, 1-2 câu tiếng Việt)",
+  "betterVersion": "(câu viết lại hoàn chỉnh hơn bằng tiếng Anh, nếu có lỗi)"
+}`;
+
+                try {
+                    const raw = await callAI(gradingPrompt, 'Bạn là giáo viên tiếng Anh nghiêm túc. Chỉ trả về JSON thuần.');
+                    let result;
+                    try { result = parseJSON(raw); } catch { result = { score: 0, isCorrect: false, verdict: 'Lỗi', positives: '', suggestion: raw, grammarErrors: [], vocabularyErrors: [] }; }
+
+                    const score = Math.max(0, Math.min(10, Number(result.score) || 0));
+                    const isCorrect = !!result.isCorrect;
+                    totalScore += score;
+                    if (isCorrect) correctCount++; else wrongList.push(i + 1);
+
+                    badge.className = `result-badge ${isCorrect ? 'correct' : 'wrong'}`;
+                    badge.textContent = isCorrect ? `✅ ${score}/10` : `❌ ${score}/10`;
+
+                    const scoreClass = score >= 8 ? 'good' : score >= 6 ? 'ok' : 'bad';
+                    const fbClass = score >= 8 ? 'correct' : score >= 6 ? 'partial' : 'wrong';
+
+                    const grammarHTML = (result.grammarErrors || []).length > 0
+                        ? `<div class="fb-section"><strong>🔴 Lỗi ngữ pháp:</strong>${(result.grammarErrors || []).map(e =>
+                            `<div class="fb-error-item"><span class="err-original">${e.original}</span><span class="err-arrow">→</span><span class="err-correct">${e.corrected}</span><br><span class="err-note">${e.explanation}</span></div>`).join('')}</div>` : '';
+
+                    const vocabHTML = (result.vocabularyErrors || []).length > 0
+                        ? `<div class="fb-section"><strong>🟡 Từ vựng cần cải thiện:</strong>${(result.vocabularyErrors || []).map(e =>
+                            `<div class="fb-error-item"><span class="err-original">${e.original}</span><span class="err-arrow">→</span><span class="err-correct">${e.better}</span><br><span class="err-note">${e.explanation}</span></div>`).join('')}</div>` : '';
+
+                    const betterHTML = result.betterVersion
+                        ? `<div class="fb-sample">✍️ Có thể viết tốt hơn: <em>${result.betterVersion}</em></div>` : '';
+
+                    fb.className = `essay-feedback ${fbClass}`;
+                    fb.style.display = 'block';
+                    fb.innerHTML = `
+                        <div class="fb-score-row">
+                            <span class="fb-score-big ${scoreClass}">${score}</span>
+                            <div><div class="fb-verdict">/10 — ${result.verdict || ''}</div></div>
+                        </div>
+                        ${result.positives ? `<div class="fb-section"><strong>✅ Điểm tốt:</strong>${result.positives}</div>` : ''}
+                        ${grammarHTML}
+                        ${vocabHTML}
+                        ${result.suggestion ? `<div class="fb-section"><strong>💡 Gợi ý:</strong>${result.suggestion}</div>` : ''}
+                        ${betterHTML}
+                        <div class="fb-sample" style="margin-top:10px">📖 Câu mẫu: <em>${q.sampleAnswer}</em></div>`;
+
+                } catch (err) {
+                    badge.className = 'result-badge wrong'; badge.textContent = '⚠️ Lỗi';
+                    fb.className = 'essay-feedback wrong'; fb.style.display = 'block';
+                    fb.innerHTML = `<div class="fb-section">Không thể chấm câu này: ${err.message}</div>`;
+                    wrongList.push(i + 1);
+                } finally {
+                    if (loadingEl) loadingEl.style.display = 'none';
+                }
+
+                // Scroll to next question
+                const nextBlock = document.getElementById(`essay-block-${i + 1}`);
+                if (nextBlock) nextBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            const avgScore = (totalScore / essayQuestions.length).toFixed(1);
+            const bar = document.getElementById('essay-score-bar');
+            if (bar) {
+                bar.style.display = 'block';
+                bar.innerHTML = `
+                    <div class="score-summary-top">
+                        <span class="score-label">🏆 Kết quả AI chấm</span>
+                        <span class="score-num">${avgScore}/10</span>
+                    </div>
+                    <div class="score-detail">
+                        <span class="score-correct">✅ Đạt (≥6đ): ${correctCount}/${essayQuestions.length}</span>
+                        <span class="score-wrong-label">❌ Chưa đạt: ${essayQuestions.length - correctCount}/${essayQuestions.length}</span>
+                    </div>
+                    ${wrongList.length > 0
+                        ? `<div class="score-wrong-list"><strong>📍 Câu cần xem lại:</strong>${wrongList.map(n => `<span class="wrong-chip" onclick="scrollToBlock('essay-block-${n - 1}')">Câu ${n}</span>`).join('')}</div>`
+                        : '<div class="score-perfect">🎉 Bạn đã đạt yêu cầu tất cả các câu!</div>'}`;
+                bar.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Chấm lại';
+        }
+
+        /* ========== QUIZ ========== */
+        async function genQuiz(topic, level, count) {
+            const prompt = `Tạo ${count} câu hỏi trắc nghiệm tiếng Anh theo yêu cầu: "${topic}", trình độ ${level}.
+Mỗi câu có đúng 4 lựa chọn A/B/C/D, chỉ 1 đáp án đúng.
+Trả về JSON hợp lệ, không markdown:
+{"questions":[{
+  "question":"(câu hỏi tiếng Anh hoặc Việt)",
+  "options":["A. ...","B. ...","C. ...","D. ..."],
+  "correct":0,
+  "whyCorrect":"(giải thích vì sao đáp án đúng, bằng tiếng Việt)",
+  "whyOthersWrong":{"1":"(vì sao B sai)","2":"(vì sao C sai)","3":"(vì sao D sai)"}
+},...]}
+(correct là index 0–3)`;
+            const raw = await callAI(prompt, 'Bạn là giáo viên tiếng Anh. Chỉ trả về JSON thuần.');
+            const data = parseJSON(raw);
+            const qs = data.questions || [];
+            if (!qs.length) throw new Error('AI không tạo được câu hỏi. Thử lại!');
+
+            document.getElementById('result-title').textContent = '📝 Trắc nghiệm: ' + topic;
+            document.getElementById('result-meta').textContent = `${qs.length} câu · ${level} · Chọn đáp án — xem giải thích ngay sau khi trả lời`;
+
+            const area = document.getElementById('exercise-area');
+            area.innerHTML = qs.map((q, i) => `
+                <div class="quiz-block" id="quiz-block-${i}">
+                    <div class="quiz-q-header">
+                        <div class="quiz-q">Câu ${i + 1}: ${q.question}</div>
+                        <span class="result-badge pending" id="quiz-badge-${i}">Chưa trả lời</span>
+                    </div>
+                    <div class="quiz-options" id="quiz-opts-${i}">
+                        ${q.options.map((opt, j) => `<button class="quiz-opt" onclick="answerQuiz(${i},${j},${JSON.stringify(q)},this)">${opt}</button>`).join('')}
+                    </div>
+                    <div class="quiz-explain" id="quiz-ex-${i}"></div>
+                </div>
+            `).join('') + `<div class="score-bar" id="score-bar" style="display:none"></div>`;
+
+            window._quizState = { total: qs.length, answered: 0, score: 0, wrong: [], _answered: {} };
+        }
+
+        function answerQuiz(qi, chosen, q, btn) {
+            const correct = q.correct;
+            const opts = document.querySelectorAll(`#quiz-opts-${qi} .quiz-opt`);
+            opts.forEach((o, j) => {
+                o.disabled = true;
+                if (j === correct) o.classList.add('correct');
+                else if (j === chosen && chosen !== correct) o.classList.add('wrong');
+            });
+
+            const badge = document.getElementById(`quiz-badge-${qi}`);
+            const isCorrect = chosen === correct;
+
+            badge.className = `result-badge ${isCorrect ? 'correct' : 'wrong'}`;
+            badge.textContent = isCorrect ? '✅ Đúng' : '❌ Sai';
+
+            const exDiv = document.getElementById(`quiz-ex-${qi}`);
+            exDiv.style.display = 'block';
+
+            let explainHTML = `<div class="explain-why">💡 Đáp án đúng: ${q.options[correct]}</div>`;
+            explainHTML += `<div class="explain-detail">${q.whyCorrect || ''}</div>`;
+            if (!isCorrect) {
+                const wrongIdx = String(chosen);
+                const wrongReason = q.whyOthersWrong?.[wrongIdx];
+                if (wrongReason) {
+                    explainHTML += `<div class="quiz-wrong-reason">❌ Tại sao ${q.options[chosen]} sai: ${wrongReason}</div>`;
+                }
+            }
+            exDiv.innerHTML = explainHTML;
+
+            const state = window._quizState;
+            if (state._answered[qi]) return;
+            state._answered[qi] = true;
+            if (isCorrect) state.score++; else state.wrong.push(qi + 1);
+            state.answered++;
+
+            if (state.answered === state.total) {
+                const wrongCount = state.total - state.score;
+                const scoreOn10 = (state.score / state.total * 10).toFixed(1);
+                const bar = document.getElementById('score-bar');
+                if (bar) {
+                    bar.style.display = 'block';
+                    bar.innerHTML = `
+                        <div class="score-summary-top">
+                            <span class="score-label">🏆 Kết quả</span>
+                            <span class="score-num">${scoreOn10}/10</span>
+                        </div>
+                        <div class="score-detail">
+                            <span class="score-correct">✅ Đúng: ${state.score}/${state.total}</span>
+                            <span class="score-wrong-label">❌ Sai: ${wrongCount}/${state.total}</span>
+                        </div>
+                        ${wrongCount > 0
+                            ? `<div class="score-wrong-list"><strong>📍 Câu làm sai:</strong>${state.wrong.map(n => `<span class="wrong-chip" onclick="scrollToBlock('quiz-block-${n - 1}')">Câu ${n}</span>`).join('')}</div>`
+                            : '<div class="score-perfect">🎉 Bạn đã trả lời đúng tất cả!</div>'}`;
+                    bar.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+
+        function scrollToBlock(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('flash-highlight');
+            setTimeout(() => el.classList.remove('flash-highlight'), 1200);
+        }
+    </script>
+</body>
+</html>

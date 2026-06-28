@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Đăng ký - FlashAI</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+            line-height: 1.5; font-weight: 400; color-scheme: light;
+            font-synthesis: none; text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        }
+        body {
+            margin: 0; padding: 20px 0; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(rgba(10,30,80,0.55), rgba(0,0,0,0.6)),
+                        url('background.jpg');
+            background-size: cover; background-position: center center;
+            background-attachment: fixed; background-repeat: no-repeat; position: relative;
+        }
+        .register-container {
+            background-color: rgba(255,255,255,0.97); border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25), 0 0 0 1px rgba(37,99,235,0.25);
+            padding: 40px 36px; width: 100%; max-width: 480px;
+            transition: transform 0.3s cubic-bezier(0.2,0.9,0.4,1.1), box-shadow 0.3s;
+            border: 1.5px solid rgba(37,99,235,0.4); margin: 0 20px;
+        }
+        .register-container:hover { transform: translateY(-6px); box-shadow: 0 32px 55px rgba(0,0,0,0.28); }
+        .logo { text-align: center; margin-bottom: 20px; }
+        .logo .logo-icon { font-size: 50px; color: #2563eb; display: block; margin-bottom: 6px; }
+        .logo h1 { color: #2563eb; margin: 8px 0 6px; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+        .welcome-text {
+            text-align: center; color: #2c3e4e; margin-bottom: 26px; font-size: 15px;
+            line-height: 1.5; font-weight: 500; background: rgba(219,234,254,0.5);
+            display: inline-block; padding: 6px 18px; border-radius: 60px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e3a6e; font-size: 0.93rem; }
+        input {
+            width: 100%; padding: 13px 16px; border: 2px solid #dbeafe; border-radius: 16px;
+            box-sizing: border-box; font-size: 16px; transition: all 0.25s ease;
+            background-color: white; font-family: inherit;
+        }
+        input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
+        button {
+            width: 100%; padding: 14px;
+            background: linear-gradient(105deg, #2563eb 0%, #1d4ed8 100%);
+            color: white; border: none; border-radius: 40px; cursor: pointer;
+            font-size: 17px; font-weight: 700; margin-top: 12px; transition: all 0.25s ease;
+            box-shadow: 0 6px 18px rgba(37,99,235,0.35); letter-spacing: 0.3px;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(37,99,235,0.45); background: linear-gradient(105deg, #3b82f6 0%, #2563eb 100%); }
+        button:active { transform: translateY(1px); }
+        button:disabled { opacity: 0.78; cursor: not-allowed; transform: none; }
+        .links { text-align: center; margin-top: 26px; }
+        .links a {
+            color: #2563eb; text-decoration: none; font-weight: 600; transition: all 0.2s;
+            display: inline-block; margin: 6px 10px; font-size: 0.9rem;
+            background: rgba(219,234,254,0.45); padding: 4px 14px; border-radius: 40px;
+        }
+        .links a:hover { color: #1d4ed8; background: rgba(37,99,235,0.15); transform: scale(1.02); }
+        .error {
+            color: #d32f2f; margin-top: 18px; text-align: center; padding: 12px;
+            background-color: #ffeaea; border-radius: 24px; border-left: 4px solid #ff4d4d;
+            font-weight: 500; font-size: 14px;
+        }
+        .password-requirements { font-size: 12px; color: #4b6a7c; margin-top: 6px; margin-left: 4px; }
+        @media (max-width: 520px) {
+            .register-container { padding: 30px 22px; }
+            .logo h1 { font-size: 26px; }
+            .welcome-text { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <i class="fa-solid fa-bolt-lightning logo-icon"></i>
+            <h1>FlashAI</h1>
+            <div class="welcome-text">🌟 Bắt đầu hành trình học tiếng Anh của bạn ngay hôm nay 🌟</div>
+        </div>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">👤 Họ và tên</label>
+                <input type="text" id="name" required placeholder="Nguyễn Văn A" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="email">📧 Email</label>
+                <input type="email" id="email" required placeholder="example@email.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">🔒 Mật khẩu</label>
+                <input type="password" id="password" required minlength="6" placeholder="••••••" autocomplete="new-password">
+                <div class="password-requirements">✔️ Mật khẩu phải có ít nhất 6 ký tự</div>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">✅ Xác nhận mật khẩu</label>
+                <input type="password" id="confirmPassword" required placeholder="Nhập lại mật khẩu" autocomplete="off">
+            </div>
+            <button type="submit" id="submitBtn">✨ Đăng ký ngay ✨</button>
+            <div class="links">
+                <a href="login.html">🔑 Đã có tài khoản? Đăng nhập</a>
+                <a href="index.html">🏠 Quay lại trang chủ</a>
+            </div>
+        </form>
+        <div id="errorMessage" class="error" style="display:none;"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc55gGulDbOCgGp2USL_HXeVLwqqXFTTU",
+            authDomain: "niceng-c235d.firebaseapp.com",
+            projectId: "niceng-c235d",
+            storageBucket: "niceng-c235d.firebasestorage.app",
+            messagingSenderId: "532991375524",
+            appId: "1:532991375524:web:699b2e9f5b1bf727d68e31",
+            measurementId: "G-PDZ20PLN86"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } else { firebase.app(); }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const registerForm = document.getElementById('registerForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirmPassword');
+        const errorDiv = document.getElementById('errorMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const clearError = () => { errorDiv.style.display = 'none'; errorDiv.textContent = ''; };
+        [nameInput, emailInput, passwordInput, confirmInput].forEach(inp => {
+            inp.addEventListener('focus', clearError);
+            inp.addEventListener('input', clearError);
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError();
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = confirmInput.value;
+
+            if (!name) { errorDiv.textContent = "❌ Vui lòng nhập họ và tên."; errorDiv.style.display='block'; nameInput.focus(); return; }
+            if (!email) { errorDiv.textContent = "❌ Vui lòng nhập địa chỉ email."; errorDiv.style.display='block'; emailInput.focus(); return; }
+            if (password.length < 6) { errorDiv.textContent = "❌ Mật khẩu phải có ít nhất 6 ký tự."; errorDiv.style.display='block'; passwordInput.focus(); return; }
+            if (password !== confirmPassword) { errorDiv.textContent = "❌ Mật khẩu xác nhận không khớp!"; errorDiv.style.display='block'; confirmInput.focus(); return; }
+
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '⏳ Đang xử lý đăng ký...';
+            submitBtn.disabled = true;
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                await db.collection('users').doc(user.uid).set({
+                    name, email, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'user', avatar: null, lastActive: new Date()
+                });
+                window.location.href = 'main.html';
+            } catch (error) {
+                let friendlyMsg = '';
+                switch (error.code) {
+                    case 'auth/email-already-in-use': friendlyMsg = '📛 Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.'; break;
+                    case 'auth/invalid-email': friendlyMsg = '📧 Địa chỉ email không hợp lệ. Hãy kiểm tra lại!'; break;
+                    case 'auth/weak-password': friendlyMsg = '🔐 Mật khẩu quá yếu. Hãy chọn mật khẩu dài hơn.'; break;
+                    case 'auth/network-request-failed': friendlyMsg = '🌐 Lỗi kết nối mạng. Vui lòng kiểm tra internet.'; break;
+                    default: friendlyMsg = `⚠️ Đăng ký thất bại: ${error.message}`;
+                }
+                errorDiv.textContent = friendlyMsg;
+                errorDiv.style.display = 'block';
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
