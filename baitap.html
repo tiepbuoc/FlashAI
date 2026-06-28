@@ -1,15 +1,12 @@
-
 <!DOCTYPE html>
-<!-- saved from url=(0046)https://tiepbuoc.github.io/FlashAI/baitap.html -->
-<html lang="vi"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>body {transition: opacity ease-in 0.2s; } 
-body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
-</style>
-    
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bài tập luyện tập - FlashAI</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns=&#39;http://www.w3.org/2000/svg&#39; viewBox=&#39;0 0 100 100&#39;&gt;&lt;text y=&#39;.9em&#39; font-size=&#39;90&#39;&gt;%E2%9A%A1&lt;/text&gt;&lt;/svg&gt;">
-    <link rel="stylesheet" href="./Bài tập luyện tập - FlashAI_files/all.min.css">
-    <script src="./Bài tập luyện tập - FlashAI_files/chart.js.tải xuống"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -303,11 +300,11 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
     </div>
 
     <!-- HOME -->
-    <div id="home-screen" style="display: block;">
+    <div id="home-screen">
         <div class="page-title">📚 Bài tập luyện tập</div>
         <div class="page-subtitle">Chọn loại bài tập — AI sẽ soạn đề theo yêu cầu của bạn</div>
         <div class="exercise-cards">
-            <div class="ex-card flashcard" onclick="openSetup(&#39;flashcard&#39;)">
+            <div class="ex-card flashcard" onclick="openSetup('flashcard')">
                 <div class="ex-icon blue"><i class="fa-solid fa-layer-group"></i></div>
                 <div class="ex-info">
                     <h3>🃏 Flashcard</h3>
@@ -315,7 +312,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
                 </div>
                 <i class="fa-solid fa-chevron-right ex-arrow"></i>
             </div>
-            <div class="ex-card essay" onclick="openSetup(&#39;essay&#39;)">
+            <div class="ex-card essay" onclick="openSetup('essay')">
                 <div class="ex-icon orange"><i class="fa-solid fa-pen-nib"></i></div>
                 <div class="ex-info">
                     <h3>✍️ Tự luận</h3>
@@ -323,7 +320,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
                 </div>
                 <i class="fa-solid fa-chevron-right ex-arrow"></i>
             </div>
-            <div class="ex-card quiz" onclick="openSetup(&#39;quiz&#39;)">
+            <div class="ex-card quiz" onclick="openSetup('quiz')">
                 <div class="ex-icon purple"><i class="fa-solid fa-list-check"></i></div>
                 <div class="ex-info">
                     <h3>📝 Trắc nghiệm</h3>
@@ -336,21 +333,17 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
         <div class="history-section" id="history-section" style="margin-top:32px;">
             <h3>📊 Lịch sử bài tập của bạn</h3>
             <div class="chart-container">
-                <canvas id="historyChart" style="box-sizing: border-box; display: block; height: 200px; width: 604px;" width="815" height="270"></canvas>
+                <canvas id="historyChart"></canvas>
             </div>
-            <div id="history-stats" style="margin-top:12px; display:flex; gap:20px; flex-wrap:wrap; font-size:0.9rem; color:#64748b;">
-                <span>📊 Tổng: 2 bài</span>
-                <span>⭐ Trung bình: 6.8/10</span>
-                <span>✍️ Tự luận: 1</span><span>🃏 Flashcard: 1</span>
-            </div>
+            <div id="history-stats" style="margin-top:12px; display:flex; gap:20px; flex-wrap:wrap; font-size:0.9rem; color:#64748b;"></div>
         </div>
     </div>
 
     <!-- SETUP -->
-    <div id="setup-screen" style="display: none;">
+    <div id="setup-screen">
         <div class="setup-card">
-            <div class="setup-title" id="setup-title">📝 Tạo Trắc nghiệm</div>
-            <div class="setup-subtitle" id="setup-subtitle">AI tạo câu hỏi trắc nghiệm 4 lựa chọn</div>
+            <div class="setup-title" id="setup-title">Thiết lập bài tập</div>
+            <div class="setup-subtitle" id="setup-subtitle">Nhập thông tin để AI tạo bài tập cho bạn</div>
             <div class="field-group">
                 <label>📌 Chủ đề / Yêu cầu cụ thể</label>
                 <textarea id="setup-topic" rows="3" placeholder="Ví dụ: Từ vựng về động vật, Ngữ pháp thì hiện tại hoàn thành, Tự luận về gia đình..."></textarea>
@@ -359,68 +352,37 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
                 <label>📊 Trình độ</label>
                 <select id="setup-level">
                     <option value="Dễ">Dễ</option>
-                    <option value="Trung bình" selected="">Trung bình</option>
+                    <option value="Trung bình" selected>Trung bình</option>
                     <option value="Khó">Khó</option>
                 </select>
             </div>
             <div class="field-group" id="count-group">
-                <label id="count-label">🔢 Số câu (3–20)</label>
-                <input type="number" id="setup-count" min="3" max="20" value="5">
+                <label id="count-label">🔢 Số lượng</label>
+                <input type="number" id="setup-count" min="3" max="20" value="5" />
             </div>
-            <button class="generate-btn" id="gen-btn" onclick="generate()"><i class="fa-solid fa-wand-magic-sparkles"></i> Tạo bài tập bằng AI</button>
+            <button class="generate-btn" id="gen-btn" onclick="generate()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo bài tập bằng AI
+            </button>
         </div>
     </div>
 
     <!-- RESULT -->
-    <div id="result-screen" style="display: none;">
+    <div id="result-screen">
         <div class="result-header">
             <div>
-                <div class="result-title" id="result-title">📝 Trắc nghiệm: Động vật</div>
-                <div class="result-meta" id="result-meta">3 câu · Trung bình · Chọn đáp án — xem giải thích ngay sau khi trả lời</div>
+                <div class="result-title" id="result-title">Bài tập</div>
+                <div class="result-meta" id="result-meta"></div>
             </div>
             <button class="redo-btn" onclick="openSetup(currentType)">
                 <i class="fa-solid fa-rotate-right"></i> Tạo lại
             </button>
         </div>
-        <div id="exercise-area">
-                <div class="quiz-block" id="quiz-block-0">
-                    <div class="quiz-q-header">
-                        <div class="quiz-q">Câu 1: Which animal is famous for having a long neck?</div>
-                        <span class="result-badge pending" id="quiz-badge-0">Chưa trả lời</span>
-                    </div>
-                    <div class="quiz-options" id="quiz-opts-0">
-                        <button class="quiz-opt" onclick="answerQuiz(0,0,{" question":"which="" animal="" is="" famous="" for="" having="" a="" long="" neck?","options":["a.="" kangaroo","b.="" giraffe","c.="" elephant","d.="" zebra"],"correct":1,"whycorrect":"giraffe="" (hươu="" cao="" cổ)="" nổi="" tiếng="" vì="" có="" cái="" cổ="" rất="" dài.","whyotherswrong":{"1":"kangaroo="" là="" loài="" thú="" túi,="" với="" việc="" nhảy="" xa,="" không="" dài.","2":"elephant="" (voi)="" vòi="" và="" kích="" thước="" lớn,="" dài.","3":"zebra="" (ngựa="" vằn)="" sọc="" đen-trắng,="" phải="" dài."}},this)"="">A. Kangaroo</button><button class="quiz-opt" onclick="answerQuiz(0,1,{" question":"which="" animal="" is="" famous="" for="" having="" a="" long="" neck?","options":["a.="" kangaroo","b.="" giraffe","c.="" elephant","d.="" zebra"],"correct":1,"whycorrect":"giraffe="" (hươu="" cao="" cổ)="" nổi="" tiếng="" vì="" có="" cái="" cổ="" rất="" dài.","whyotherswrong":{"1":"kangaroo="" là="" loài="" thú="" túi,="" với="" việc="" nhảy="" xa,="" không="" dài.","2":"elephant="" (voi)="" vòi="" và="" kích="" thước="" lớn,="" dài.","3":"zebra="" (ngựa="" vằn)="" sọc="" đen-trắng,="" phải="" dài."}},this)"="">B. Giraffe</button><button class="quiz-opt" onclick="answerQuiz(0,2,{" question":"which="" animal="" is="" famous="" for="" having="" a="" long="" neck?","options":["a.="" kangaroo","b.="" giraffe","c.="" elephant","d.="" zebra"],"correct":1,"whycorrect":"giraffe="" (hươu="" cao="" cổ)="" nổi="" tiếng="" vì="" có="" cái="" cổ="" rất="" dài.","whyotherswrong":{"1":"kangaroo="" là="" loài="" thú="" túi,="" với="" việc="" nhảy="" xa,="" không="" dài.","2":"elephant="" (voi)="" vòi="" và="" kích="" thước="" lớn,="" dài.","3":"zebra="" (ngựa="" vằn)="" sọc="" đen-trắng,="" phải="" dài."}},this)"="">C. Elephant</button><button class="quiz-opt" onclick="answerQuiz(0,3,{" question":"which="" animal="" is="" famous="" for="" having="" a="" long="" neck?","options":["a.="" kangaroo","b.="" giraffe","c.="" elephant","d.="" zebra"],"correct":1,"whycorrect":"giraffe="" (hươu="" cao="" cổ)="" nổi="" tiếng="" vì="" có="" cái="" cổ="" rất="" dài.","whyotherswrong":{"1":"kangaroo="" là="" loài="" thú="" túi,="" với="" việc="" nhảy="" xa,="" không="" dài.","2":"elephant="" (voi)="" vòi="" và="" kích="" thước="" lớn,="" dài.","3":"zebra="" (ngựa="" vằn)="" sọc="" đen-trắng,="" phải="" dài."}},this)"="">D. Zebra</button>
-                    </div>
-                    <div class="quiz-explain" id="quiz-ex-0"></div>
-                </div>
-            
-                <div class="quiz-block" id="quiz-block-1">
-                    <div class="quiz-q-header">
-                        <div class="quiz-q">Câu 2: Choose the correct sentence: </div>
-                        <span class="result-badge pending" id="quiz-badge-1">Chưa trả lời</span>
-                    </div>
-                    <div class="quiz-options" id="quiz-opts-1">
-                        <button class="quiz-opt" onclick="answerQuiz(1,0,{" question":"choose="" the="" correct="" sentence:="" ","options":["a.="" a="" cat="" is="" swim="" very="" well.","b.="" cats="" can="" well.","c.="" swimming="" well.","d.="" are="" well."],"correct":1,"whycorrect":"câu="" đúng="" là="" “cats="" well.”="" vì="" sau="" “can”="" dùng="" động="" từ="" nguyên="" mẫu="" (swim).","whyotherswrong":{"1":"“is="" swim”="" sai="" cấu="" trúc:="" cần="" “can="" hoặc="" “swims”,="" không="" “is="" swim”.","2":"“can="" swimming”="" dạng="" v-ing;="" phải="" “swim”.","3":"“are="" can”="" kép="" “are”="" đi="" với="" theo="" cách="" này."}},this)"="">A. A cat is swim very well.</button><button class="quiz-opt" onclick="answerQuiz(1,1,{" question":"choose="" the="" correct="" sentence:="" ","options":["a.="" a="" cat="" is="" swim="" very="" well.","b.="" cats="" can="" well.","c.="" swimming="" well.","d.="" are="" well."],"correct":1,"whycorrect":"câu="" đúng="" là="" “cats="" well.”="" vì="" sau="" “can”="" dùng="" động="" từ="" nguyên="" mẫu="" (swim).","whyotherswrong":{"1":"“is="" swim”="" sai="" cấu="" trúc:="" cần="" “can="" hoặc="" “swims”,="" không="" “is="" swim”.","2":"“can="" swimming”="" dạng="" v-ing;="" phải="" “swim”.","3":"“are="" can”="" kép="" “are”="" đi="" với="" theo="" cách="" này."}},this)"="">B. Cats can swim very well.</button><button class="quiz-opt" onclick="answerQuiz(1,2,{" question":"choose="" the="" correct="" sentence:="" ","options":["a.="" a="" cat="" is="" swim="" very="" well.","b.="" cats="" can="" well.","c.="" swimming="" well.","d.="" are="" well."],"correct":1,"whycorrect":"câu="" đúng="" là="" “cats="" well.”="" vì="" sau="" “can”="" dùng="" động="" từ="" nguyên="" mẫu="" (swim).","whyotherswrong":{"1":"“is="" swim”="" sai="" cấu="" trúc:="" cần="" “can="" hoặc="" “swims”,="" không="" “is="" swim”.","2":"“can="" swimming”="" dạng="" v-ing;="" phải="" “swim”.","3":"“are="" can”="" kép="" “are”="" đi="" với="" theo="" cách="" này."}},this)"="">C. Cats can swimming very well.</button><button class="quiz-opt" onclick="answerQuiz(1,3,{" question":"choose="" the="" correct="" sentence:="" ","options":["a.="" a="" cat="" is="" swim="" very="" well.","b.="" cats="" can="" well.","c.="" swimming="" well.","d.="" are="" well."],"correct":1,"whycorrect":"câu="" đúng="" là="" “cats="" well.”="" vì="" sau="" “can”="" dùng="" động="" từ="" nguyên="" mẫu="" (swim).","whyotherswrong":{"1":"“is="" swim”="" sai="" cấu="" trúc:="" cần="" “can="" hoặc="" “swims”,="" không="" “is="" swim”.","2":"“can="" swimming”="" dạng="" v-ing;="" phải="" “swim”.","3":"“are="" can”="" kép="" “are”="" đi="" với="" theo="" cách="" này."}},this)"="">D. Cats are can swim very well.</button>
-                    </div>
-                    <div class="quiz-explain" id="quiz-ex-1"></div>
-                </div>
-            
-                <div class="quiz-block" id="quiz-block-2">
-                    <div class="quiz-q-header">
-                        <div class="quiz-q">Câu 3: What does a dog do when it hears a stranger?</div>
-                        <span class="result-badge pending" id="quiz-badge-2">Chưa trả lời</span>
-                    </div>
-                    <div class="quiz-options" id="quiz-opts-2">
-                        <button class="quiz-opt" onclick="answerQuiz(2,0,{" question":"what="" does="" a="" dog="" do="" when="" it="" hears="" stranger?","options":["a.="" usually="" barks.","b.="" purrs.","c.="" lays="" eggs.","d.="" grows="" feathers."],"correct":0,"whycorrect":"chó="" thường="" sủa="" khi="" nghe="" người="" lạ.","whyotherswrong":{"1":"mèo="" kêu="" “purr”="" (gừ)="" chứ="" không="" phải="" chó="" sủa.","2":"chó="" đẻ="" trứng;="" chúng="" sinh="" con.","3":"chó="" mọc="" lông="" vũ="" (feathers);="" có="" lông."}},this)"="">A. It usually barks.</button><button class="quiz-opt" onclick="answerQuiz(2,1,{" question":"what="" does="" a="" dog="" do="" when="" it="" hears="" stranger?","options":["a.="" usually="" barks.","b.="" purrs.","c.="" lays="" eggs.","d.="" grows="" feathers."],"correct":0,"whycorrect":"chó="" thường="" sủa="" khi="" nghe="" người="" lạ.","whyotherswrong":{"1":"mèo="" kêu="" “purr”="" (gừ)="" chứ="" không="" phải="" chó="" sủa.","2":"chó="" đẻ="" trứng;="" chúng="" sinh="" con.","3":"chó="" mọc="" lông="" vũ="" (feathers);="" có="" lông."}},this)"="">B. It usually purrs.</button><button class="quiz-opt" onclick="answerQuiz(2,2,{" question":"what="" does="" a="" dog="" do="" when="" it="" hears="" stranger?","options":["a.="" usually="" barks.","b.="" purrs.","c.="" lays="" eggs.","d.="" grows="" feathers."],"correct":0,"whycorrect":"chó="" thường="" sủa="" khi="" nghe="" người="" lạ.","whyotherswrong":{"1":"mèo="" kêu="" “purr”="" (gừ)="" chứ="" không="" phải="" chó="" sủa.","2":"chó="" đẻ="" trứng;="" chúng="" sinh="" con.","3":"chó="" mọc="" lông="" vũ="" (feathers);="" có="" lông."}},this)"="">C. It usually lays eggs.</button><button class="quiz-opt" onclick="answerQuiz(2,3,{" question":"what="" does="" a="" dog="" do="" when="" it="" hears="" stranger?","options":["a.="" usually="" barks.","b.="" purrs.","c.="" lays="" eggs.","d.="" grows="" feathers."],"correct":0,"whycorrect":"chó="" thường="" sủa="" khi="" nghe="" người="" lạ.","whyotherswrong":{"1":"mèo="" kêu="" “purr”="" (gừ)="" chứ="" không="" phải="" chó="" sủa.","2":"chó="" đẻ="" trứng;="" chúng="" sinh="" con.","3":"chó="" mọc="" lông="" vũ="" (feathers);="" có="" lông."}},this)"="">D. It usually grows feathers.</button>
-                    </div>
-                    <div class="quiz-explain" id="quiz-ex-2"></div>
-                </div>
-            <div class="score-bar" id="score-bar" style="display:none"></div></div>
+        <div id="exercise-area"></div>
     </div>
 
-    <script src="./Bài tập luyện tập - FlashAI_files/firebase-app-compat.js.tải xuống"></script>
-    <script src="./Bài tập luyện tập - FlashAI_files/firebase-auth-compat.js.tải xuống"></script>
-    <script src="./Bài tập luyện tập - FlashAI_files/firebase-firestore-compat.js.tải xuống"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCFt47TgrNSI7dbk-rYw7N4gciLb37P08w",
@@ -1048,8 +1010,6 @@ Trả về JSON hợp lệ, không markdown:
             const qs = data.questions || [];
             if (!qs.length) throw new Error('AI không tạo được câu hỏi. Thử lại!');
 
-            window._quizQuestions = qs;
-
             document.getElementById('result-title').textContent = '📝 Trắc nghiệm: ' + topic;
             document.getElementById('result-meta').textContent = `${qs.length} câu · ${levelDisplay} · Chọn đáp án — xem giải thích ngay sau khi trả lời`;
 
@@ -1061,7 +1021,7 @@ Trả về JSON hợp lệ, không markdown:
                         <span class="result-badge pending" id="quiz-badge-${i}">Chưa trả lời</span>
                     </div>
                     <div class="quiz-options" id="quiz-opts-${i}">
-                        ${q.options.map((opt, j) => `<button class="quiz-opt" onclick="answerQuiz(${i},${j})">${opt}</button>`).join('')}
+                        ${q.options.map((opt, j) => `<button class="quiz-opt" onclick="answerQuiz(${i},${j},${JSON.stringify(q)},this)">${opt}</button>`).join('')}
                     </div>
                     <div class="quiz-explain" id="quiz-ex-${i}"></div>
                 </div>
@@ -1070,8 +1030,7 @@ Trả về JSON hợp lệ, không markdown:
             window._quizState = { total: qs.length, answered: 0, score: 0, wrong: [], _answered: {} };
         }
 
-        function answerQuiz(qi, chosen) {
-            const q = window._quizQuestions[qi];
+        function answerQuiz(qi, chosen, q, btn) {
             const correct = q.correct;
             const opts = document.querySelectorAll(`#quiz-opts-${qi} .quiz-opt`);
             opts.forEach((o, j) => {
@@ -1150,6 +1109,5 @@ Trả về JSON hợp lệ, không markdown:
             }
         });
     </script>
-
-
-<veepn-lock-screen><template shadowrootmode="open"><style>html{box-sizing:border-box;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;word-break:normal;tab-size:4}*,:before,:after{box-sizing:border-box;background-repeat:no-repeat}:before,:after{-webkit-text-decoration:inherit;text-decoration:inherit;vertical-align:inherit}*{margin:0;padding:0}hr{height:0;color:inherit;border:0;border-top:1px solid;overflow:visible}details,main{display:block}summary{display:list-item}small{font-size:80%}[hidden]{display:none!important}abbr[title]{border-bottom:none;-webkit-text-decoration:underline dotted;text-decoration:underline dotted}a{background-color:#0000}a:active,a:hover{outline-width:0}code,kbd,pre,samp{font-family:monospace}pre{font-size:1em}b,strong{font-weight:bolder}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{border-color:inherit;text-indent:0}iframe{border-style:none}input{border-radius:0}[type=number]::-webkit-inner-spin-button{height:auto}[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{appearance:none}textarea{resize:vertical;overflow:auto}button,input,optgroup,select,textarea{font:inherit;color:inherit}optgroup{font-weight:700}button{overflow:visible}button,select{text-transform:none}button,[type=button],[type=reset],[type=submit],[role=button]{cursor:pointer}button::-moz-focus-inner{border-style:none;padding:0}[type=button]::-moz-focus-inner{border-style:none;padding:0}[type=reset]::-moz-focus-inner{border-style:none;padding:0}[type=submit]::-moz-focus-inner{border-style:none;padding:0}button,html [type=button],[type=reset],[type=submit]{appearance:auto}button,input,select,textarea{background-color:#0000;border-style:none}button:-moz-focusring{outline:1px dotted buttontext}[type=button]::-moz-focus-inner{outline:1px dotted buttontext}[type=reset]::-moz-focus-inner{outline:1px dotted buttontext}[type=submit]::-moz-focus-inner{outline:1px dotted buttontext}select{appearance:none}a:focus,button:focus,input:focus,select:focus,textarea:focus{outline-width:0}select::-ms-expand{display:none}select::-ms-value{color:currentColor}legend{color:inherit;white-space:normal;border:0;max-width:100%;display:table}::-webkit-file-upload-button{appearance:auto;color:inherit;font:inherit}[disabled]{cursor:default}img{border-style:none}progress{vertical-align:baseline}[aria-busy=true]{cursor:progress}[aria-controls]{cursor:pointer}[aria-disabled=true]{cursor:default}ul,ol{list-style-type:none}figure{margin:0}@keyframes slide-in{0%{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0%)}}.gradient-blue{background:radial-gradient(106.41% 128.47% at 50.15% 128.47%,#23abff 0%,#3066ff 100%)}.gradient-green{background:radial-gradient(92.26% 118.88% at 50.15% .13%,#00c3c3 0%,#00aab3 100%)}.gradient-purple{background:radial-gradient(165.12% 115.56% at 50.15% .13%,#a15aff 0%,#00a0eb 100%)}.bg-blue{background-color:#f2f5ff}.bg-purple{background-color:#f7f0ff}.bg-green{background-color:#ebffed}.lock-screen{letter-spacing:normal;z-index:2147483638;border-radius:24px;width:327px;font-family:FigtreeVF,sans-serif;animation:.3s ease-in-out forwards slide-in;position:fixed;bottom:24px;right:24px;overflow:hidden;box-shadow:0 24px 32px #00000014}.lock-screen__content{padding:24px 24px 64px;position:relative}.lock-screen__close{opacity:.5;justify-content:center;align-items:center;width:24px;height:24px;display:flex;position:absolute;top:16px;right:16px}.lock-screen__label{color:#fff;background-color:#fff3;border-radius:50px;justify-content:center;align-items:center;gap:8px;width:fit-content;height:26px;margin:-8px auto 16px;padding-inline:16px;font-size:12px;line-height:18px;display:flex}.lock-screen__title{color:#fff;text-align:center;margin-bottom:8px;font-size:20px;font-weight:600;line-height:28px}.lock-screen__description{color:#f5f6f7;text-align:center;font-size:14px;line-height:20px}.lock-screen__description b{font-weight:600}.lock-screen__card{z-index:1;background-color:#fff;border-radius:24px;margin-top:-44px;padding:32px 20px 20px;position:relative}.lock-screen__inner{margin-bottom:24px}.lock-screen__submit{color:#fff;background-color:#f70;border-radius:12px;justify-content:center;align-items:center;gap:10px;width:100%;height:40px;margin-bottom:16px;padding-inline:16px;font-size:16px;font-weight:700;display:flex}.lock-screen__skip{color:#82829c;justify-content:center;align-items:center;margin-inline:auto;font-size:14px;line-height:20px;display:flex}.price-card{background:linear-gradient(254.14deg,#fafbff .04%,#f5f8ff 100.04%);border:1px solid #f2f2fc;border-radius:24px;padding:24px 28px}.price-card__label{color:#4a5764;text-align:center;text-transform:uppercase;margin-bottom:16px;font-size:14px;line-height:20px}.price-card__price{justify-content:center;align-items:flex-start;column-gap:2px;margin-bottom:12px;display:flex}.price-card__currency{color:#515478;font-size:18px;line-height:28px}.price-card__number{color:#14142a;text-align:center;font-size:64px;line-height:54px}.price-card__wrap{flex-direction:column;display:flex}.price-card__decimal{color:#515478;font-size:18px;font-weight:600;line-height:28px}.price-card__period{color:#515478;margin-top:-6px;font-size:14px;line-height:20px}.price-card__discount{justify-content:center;align-items:center;margin-bottom:12px;display:flex;position:relative}.price-card__discount-divider{z-index:0;background-color:#dbe2f9;width:100%;height:1px;position:absolute;top:50%;left:0;transform:translateY(-50%)}.price-card__discount-icon{z-index:1;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.price-card__discount-text{z-index:2;color:#fff;font-size:12px;font-weight:600;line-height:18px;position:relative}.price-card__features{justify-content:center;align-items:center;column-gap:16px;display:flex}.price-card__feature{color:#222e3a;align-items:center;gap:6px;font-size:14px;line-height:20px;display:flex}.price-card__feature:before{content:"";background-color:#20df9e;border-radius:50%;flex-shrink:0;width:4px;height:4px;display:block}.features-list{grid-template-columns:repeat(3,1fr);gap:12px;display:grid}.features-list__item{flex-direction:column;align-items:center;gap:6px;display:flex}.features-list__icon{border-radius:12px;justify-content:center;align-items:center;width:52px;height:52px;display:flex}.features-list__text{color:#293a53;text-align:center;letter-spacing:-.1px;font-size:16px;line-height:24px}</style></template><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2)format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2)format("woff2-variations");font-weight:100 1000;font-display:swap}</style></veepn-lock-screen></body></html>
+</body>
+</html>
