@@ -6,6 +6,7 @@
     <title>Bài tập luyện tập - FlashAI</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -270,6 +271,14 @@
         @keyframes flashHL { 0% { box-shadow: 0 0 0 5px rgba(220,38,38,0.5); } 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.07); } }
         .flash-highlight { animation: flashHL 1.2s ease; }
 
+        /* ---- HISTORY CHART ---- */
+        .history-section {
+            background: white; border-radius: 20px; padding: 24px 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07); margin-top: 24px;
+        }
+        .history-section h3 { font-weight: 700; margin-bottom: 16px; font-size: 1.1rem; }
+        .history-section .chart-container { height: 200px; }
+
         @media (max-width: 600px) {
             .page-title { font-size: 1.5rem; }
             .ex-card { padding: 18px 16px; gap: 14px; }
@@ -320,6 +329,14 @@
                 <i class="fa-solid fa-chevron-right ex-arrow"></i>
             </div>
         </div>
+        <!-- Lịch sử bài tập -->
+        <div class="history-section" id="history-section" style="margin-top:32px;">
+            <h3>📊 Lịch sử bài tập của bạn</h3>
+            <div class="chart-container">
+                <canvas id="historyChart"></canvas>
+            </div>
+            <div id="history-stats" style="margin-top:12px; display:flex; gap:20px; flex-wrap:wrap; font-size:0.9rem; color:#64748b;"></div>
+        </div>
     </div>
 
     <!-- SETUP -->
@@ -334,9 +351,9 @@
             <div class="field-group">
                 <label>📊 Trình độ</label>
                 <select id="setup-level">
-                    <option value="cơ bản (A1-A2)">Cơ bản (A1–A2)</option>
-                    <option value="trung bình (B1-B2)" selected>Trung bình (B1–B2)</option>
-                    <option value="nâng cao (C1-C2)">Nâng cao (C1–C2)</option>
+                    <option value="Dễ">Dễ</option>
+                    <option value="Trung bình" selected>Trung bình</option>
+                    <option value="Khó">Khó</option>
                 </select>
             </div>
             <div class="field-group" id="count-group">
@@ -365,6 +382,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCFt47TgrNSI7dbk-rYw7N4gciLb37P08w",
@@ -377,7 +395,20 @@
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        auth.onAuthStateChanged(u => { if (!u) auth.signInAnonymously().catch(() => {}); });
+        const db = firebase.firestore();
+        
+        let currentUser = null;
+        let historyChart = null;
+        let historyData = [];
+
+        auth.onAuthStateChanged(u => { 
+            if (u) { 
+                currentUser = u;
+                loadHistory();
+            } else { 
+                auth.signInAnonymously().catch(() => {}); 
+            } 
+        });
 
         const API_URL = "https://api.shopaikey.com/v1/chat/completions";
         function getAPIKey() { return "sk-4150297863e3eee405805e8609648e6c5cebb1b502ffb46e"; }
@@ -399,6 +430,185 @@
 
         function parseJSON(raw) {
             return JSON.parse(raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim());
+        }
+
+        // Map level hiển thị sang level cho AI
+        function getLevelForAI(displayLevel) {
+            const map = {
+                'Dễ': 'cơ bản (A1-A2)',
+                'Trung bình': 'trung bình (B1-B2)',
+                'Khó': 'nâng cao (C1-C2)'
+            };
+            return map[displayLevel] || 'trung bình (B1-B2)';
+        }
+
+        // Map level hiển thị sang level lưu trong history
+        function getLevelCode(displayLevel) {
+            const map = {
+                'Dễ': 'easy',
+                'Trung bình': 'medium',
+                'Khó': 'hard'
+            };
+            return map[displayLevel] || 'medium';
+        }
+
+        // Lưu lịch sử bài tập
+        async function saveHistory(type, level, score, total, details) {
+            if (!currentUser) return;
+            try {
+                await db.collection('users').doc(currentUser.uid).collection('exerciseHistory').add({
+                    type: type,
+                    level: level,
+                    levelCode: getLevelCode(level),
+                    score: score,
+                    total: total,
+                    details: details || {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                loadHistory();
+            } catch (e) {
+                console.error('Lỗi lưu lịch sử:', e);
+            }
+        }
+
+        // Load lịch sử và vẽ biểu đồ
+        async function loadHistory() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection('users').doc(currentUser.uid)
+                    .collection('exerciseHistory')
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .get();
+                
+                historyData = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    historyData.push({
+                        id: doc.id,
+                        type: data.type || 'unknown',
+                        level: data.level || 'Trung bình',
+                        levelCode: data.levelCode || 'medium',
+                        score: data.score || 0,
+                        total: data.total || 1,
+                        createdAt: data.createdAt?.toDate?.() || new Date()
+                    });
+                });
+                historyData.reverse();
+                renderHistoryChart();
+            } catch (e) {
+                console.error('Lỗi load lịch sử:', e);
+            }
+        }
+
+        function renderHistoryChart() {
+            const ctx = document.getElementById('historyChart');
+            if (!ctx) return;
+            
+            if (historyChart) {
+                historyChart.destroy();
+            }
+            
+            if (historyData.length === 0) {
+                historyChart = new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Chưa có dữ liệu'],
+                        datasets: [{ label: 'Điểm', data: [0], borderColor: '#94a3b8' }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                document.getElementById('history-stats').innerHTML = '<span>Chưa có lịch sử làm bài tập.</span>';
+                return;
+            }
+
+            const labels = historyData.map((item, i) => {
+                const date = item.createdAt;
+                return (i + 1) + '. ' + (date ? date.toLocaleDateString('vi-VN') : '');
+            });
+            
+            const scores = historyData.map(item => Math.round((item.score / item.total) * 10));
+            const types = historyData.map(item => item.type);
+            const levels = historyData.map(item => item.level);
+
+            const colorMap = {
+                'flashcard': '#2563eb',
+                'essay': '#ea580c',
+                'quiz': '#7c3aed'
+            };
+            const levelColorMap = {
+                'Dễ': '#16a34a',
+                'Trung bình': '#ea580c',
+                'Khó': '#dc2626'
+            };
+
+            historyChart = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Điểm (thang 10)',
+                            data: scores,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37,99,235,0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: scores.map(s => s >= 7 ? '#16a34a' : s >= 5 ? '#ea580c' : '#dc2626'),
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 10,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const idx = context[0].dataIndex;
+                                    const item = historyData[idx];
+                                    return [
+                                        'Loại: ' + (item.type === 'flashcard' ? 'Flashcard' : item.type === 'essay' ? 'Tự luận' : 'Trắc nghiệm'),
+                                        'Trình độ: ' + item.level,
+                                        'Điểm: ' + item.score + '/' + item.total
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Thống kê
+            const totalEx = historyData.length;
+            const avgScore = (historyData.reduce((sum, item) => sum + (item.score / item.total), 0) / totalEx * 10).toFixed(1);
+            
+            const typeCount = {};
+            historyData.forEach(item => {
+                typeCount[item.type] = (typeCount[item.type] || 0) + 1;
+            });
+            
+            document.getElementById('history-stats').innerHTML = `
+                <span>📊 Tổng: ${totalEx} bài</span>
+                <span>⭐ Trung bình: ${avgScore}/10</span>
+                ${Object.entries(typeCount).map(([key, val]) => 
+                    `<span>${key === 'flashcard' ? '🃏' : key === 'essay' ? '✍️' : '📝'} ${key === 'flashcard' ? 'Flashcard' : key === 'essay' ? 'Tự luận' : 'Trắc nghiệm'}: ${val}</span>`
+                ).join('')}
+            `;
         }
 
         let currentType = 'flashcard';
@@ -447,7 +657,8 @@
 
         async function generate() {
             const topic = document.getElementById('setup-topic').value.trim();
-            const level = document.getElementById('setup-level').value;
+            const levelDisplay = document.getElementById('setup-level').value;
+            const levelAI = getLevelForAI(levelDisplay);
             const count = parseInt(document.getElementById('setup-count').value) || 5;
             if (!topic) { alert('Vui lòng nhập chủ đề hoặc yêu cầu!'); document.getElementById('setup-topic').focus(); return; }
 
@@ -457,9 +668,9 @@
             showScreen('result');
 
             try {
-                if (currentType === 'flashcard') await genFlashcard(topic, level, count);
-                else if (currentType === 'essay') await genEssay(topic, level, count);
-                else await genQuiz(topic, level, count);
+                if (currentType === 'flashcard') await genFlashcard(topic, levelAI, count, levelDisplay);
+                else if (currentType === 'essay') await genEssay(topic, levelAI, count, levelDisplay);
+                else await genQuiz(topic, levelAI, count, levelDisplay);
             } catch (e) {
                 document.getElementById('exercise-area').innerHTML = `
                     <div class="loading-box">
@@ -475,8 +686,10 @@
 
         /* ========== FLASHCARD ========== */
         let fcCards = [], fcIndex = 0, fcKnown = 0, fcRedo = 0, fcResults = [];
+        let currentLevelDisplay = 'Trung bình';
 
-        async function genFlashcard(topic, level, count) {
+        async function genFlashcard(topic, level, count, levelDisplay) {
+            currentLevelDisplay = levelDisplay;
             const prompt = `Tạo ${count} flashcard từ vựng tiếng Anh về chủ đề hoặc yêu cầu: "${topic}", trình độ ${level}.
 Trả về JSON hợp lệ, không markdown:
 {"cards":[{"word":"...","phonetic":"...","partOfSpeech":"n/v/adj/adv/...","meaning":"(nghĩa tiếng Việt)","example":"(câu ví dụ tiếng Anh)","exampleTranslation":"(dịch nghĩa câu ví dụ)","tip":"(mẹo nhớ từ ngắn gọn, nếu có)"},...]}`
@@ -485,10 +698,10 @@ Trả về JSON hợp lệ, không markdown:
             fcCards = data.cards || [];
             if (!fcCards.length) throw new Error('AI không tạo được thẻ. Thử lại!');
             fcIndex = 0; fcKnown = 0; fcRedo = 0;
-            fcResults = new Array(fcCards.length).fill(null); // null=chưa xem, 'known', 'redo'
+            fcResults = new Array(fcCards.length).fill(null);
 
             document.getElementById('result-title').textContent = '🃏 Flashcard: ' + topic;
-            document.getElementById('result-meta').textContent = `${fcCards.length} thẻ · ${level} · Bấm thẻ để lật · Chọn Đã nhớ / Học lại`;
+            document.getElementById('result-meta').textContent = `${fcCards.length} thẻ · ${levelDisplay} · Bấm thẻ để lật · Chọn Đã nhớ / Học lại`;
             renderFlashcard();
         }
 
@@ -555,6 +768,12 @@ Trả về JSON hợp lệ, không markdown:
             const pct = Math.round((fcKnown / total) * 100);
             const skipped = fcResults.filter(r => r === null).length;
 
+            // Lưu lịch sử
+            saveHistory('flashcard', currentLevelDisplay, fcKnown, total, { 
+                redo: fcRedo, 
+                skipped: skipped 
+            });
+
             const rows = fcCards.map((card, i) => {
                 const r = fcResults[i];
                 const badge = r === 'known'
@@ -595,7 +814,8 @@ Trả về JSON hợp lệ, không markdown:
         /* ========== ESSAY ========== */
         let essayQuestions = [];
 
-        async function genEssay(topic, level, count) {
+        async function genEssay(topic, level, count, levelDisplay) {
+            currentLevelDisplay = levelDisplay;
             const prompt = `Tạo ${count} câu hỏi tự luận tiếng Anh theo yêu cầu: "${topic}", trình độ ${level}.
 Mỗi câu yêu cầu học sinh viết 1–3 câu tiếng Anh.
 Trả về JSON hợp lệ, không markdown:
@@ -611,7 +831,7 @@ Trả về JSON hợp lệ, không markdown:
             if (!essayQuestions.length) throw new Error('AI không tạo được câu hỏi. Thử lại!');
 
             document.getElementById('result-title').textContent = '✍️ Tự luận: ' + topic;
-            document.getElementById('result-meta').textContent = `${essayQuestions.length} câu · ${level} · Viết câu trả lời tiếng Anh · AI chấm từng câu`;
+            document.getElementById('result-meta').textContent = `${essayQuestions.length} câu · ${levelDisplay} · Viết câu trả lời tiếng Anh · AI chấm từng câu`;
 
             const area = document.getElementById('exercise-area');
             area.innerHTML = essayQuestions.map((q, i) => `
@@ -637,6 +857,10 @@ Trả về JSON hợp lệ, không markdown:
              </button>`;
         }
 
+        let essayScoreSum = 0;
+        let essayCorrectCount = 0;
+        let essayTotalQuestions = 0;
+
         async function checkEssays() {
             const btn = document.getElementById('submit-essay-btn');
             btn.disabled = true;
@@ -652,7 +876,6 @@ Trả về JSON hợp lệ, không markdown:
                 const badge = document.getElementById(`essay-badge-${i}`);
                 const loadingEl = document.getElementById(`essay-loading-${i}`);
 
-                // Show inline loading
                 if (loadingEl) loadingEl.style.display = 'block';
 
                 if (!answer) {
@@ -734,7 +957,6 @@ Hãy chấm điểm (thang 0-10) và phân tích chi tiết. Trả về JSON thu
                     if (loadingEl) loadingEl.style.display = 'none';
                 }
 
-                // Scroll to next question
                 const nextBlock = document.getElementById(`essay-block-${i + 1}`);
                 if (nextBlock) nextBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
@@ -758,12 +980,20 @@ Hãy chấm điểm (thang 0-10) và phân tích chi tiết. Trả về JSON thu
                 bar.scrollIntoView({ behavior: 'smooth' });
             }
 
+            // Lưu lịch sử
+            saveHistory('essay', currentLevelDisplay, Math.round(totalScore), essayQuestions.length * 10, {
+                avgScore: avgScore,
+                correctCount: correctCount,
+                totalQuestions: essayQuestions.length
+            });
+
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Chấm lại';
         }
 
         /* ========== QUIZ ========== */
-        async function genQuiz(topic, level, count) {
+        async function genQuiz(topic, level, count, levelDisplay) {
+            currentLevelDisplay = levelDisplay;
             const prompt = `Tạo ${count} câu hỏi trắc nghiệm tiếng Anh theo yêu cầu: "${topic}", trình độ ${level}.
 Mỗi câu có đúng 4 lựa chọn A/B/C/D, chỉ 1 đáp án đúng.
 Trả về JSON hợp lệ, không markdown:
@@ -781,7 +1011,7 @@ Trả về JSON hợp lệ, không markdown:
             if (!qs.length) throw new Error('AI không tạo được câu hỏi. Thử lại!');
 
             document.getElementById('result-title').textContent = '📝 Trắc nghiệm: ' + topic;
-            document.getElementById('result-meta').textContent = `${qs.length} câu · ${level} · Chọn đáp án — xem giải thích ngay sau khi trả lời`;
+            document.getElementById('result-meta').textContent = `${qs.length} câu · ${levelDisplay} · Chọn đáp án — xem giải thích ngay sau khi trả lời`;
 
             const area = document.getElementById('exercise-area');
             area.innerHTML = qs.map((q, i) => `
@@ -855,6 +1085,11 @@ Trả về JSON hợp lệ, không markdown:
                             : '<div class="score-perfect">🎉 Bạn đã trả lời đúng tất cả!</div>'}`;
                     bar.scrollIntoView({ behavior: 'smooth' });
                 }
+                // Lưu lịch sử
+                saveHistory('quiz', currentLevelDisplay, state.score, state.total, {
+                    wrongCount: wrongCount,
+                    wrongList: state.wrong
+                });
             }
         }
 
@@ -865,6 +1100,14 @@ Trả về JSON hợp lệ, không markdown:
             el.classList.add('flash-highlight');
             setTimeout(() => el.classList.remove('flash-highlight'), 1200);
         }
+
+        // Khi đã đăng nhập, load lịch sử
+        auth.onAuthStateChanged(u => {
+            if (u) {
+                currentUser = u;
+                loadHistory();
+            }
+        });
     </script>
 </body>
 </html>
