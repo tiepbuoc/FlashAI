@@ -1013,6 +1013,9 @@ Trả về JSON hợp lệ, không markdown:
             document.getElementById('result-title').textContent = '📝 Trắc nghiệm: ' + topic;
             document.getElementById('result-meta').textContent = `${qs.length} câu · ${levelDisplay} · Chọn đáp án — xem giải thích ngay sau khi trả lời`;
 
+            // Lưu câu hỏi vào biến toàn cục để tránh lỗi JSON trong onclick
+            window._quizQuestions = qs;
+
             const area = document.getElementById('exercise-area');
             area.innerHTML = qs.map((q, i) => `
                 <div class="quiz-block" id="quiz-block-${i}">
@@ -1021,7 +1024,7 @@ Trả về JSON hợp lệ, không markdown:
                         <span class="result-badge pending" id="quiz-badge-${i}">Chưa trả lời</span>
                     </div>
                     <div class="quiz-options" id="quiz-opts-${i}">
-                        ${q.options.map((opt, j) => `<button class="quiz-opt" onclick="answerQuiz(${i},${j},${JSON.stringify(q)},this)">${opt}</button>`).join('')}
+                        ${q.options.map((opt, j) => `<button class="quiz-opt" onclick="answerQuiz(${i},${j},this)">${opt}</button>`).join('')}
                     </div>
                     <div class="quiz-explain" id="quiz-ex-${i}"></div>
                 </div>
@@ -1030,7 +1033,8 @@ Trả về JSON hợp lệ, không markdown:
             window._quizState = { total: qs.length, answered: 0, score: 0, wrong: [], _answered: {} };
         }
 
-        function answerQuiz(qi, chosen, q, btn) {
+        function answerQuiz(qi, chosen, btn) {
+            const q = window._quizQuestions[qi];
             const correct = q.correct;
             const opts = document.querySelectorAll(`#quiz-opts-${qi} .quiz-opt`);
             opts.forEach((o, j) => {
